@@ -1,0 +1,33 @@
+####################################################################
+#                                                                  #
+#             Makefile for FIRE Solver Benchmarks                  #
+#                                                                  #
+####################################################################
+
+CC = icc
+CFLAGS = -g -O0 -std=c99 -w3 -DCACHE_PROFILE
+LIBS = -lm
+
+# Make sure you have loaded the papi module before uncommenting these and include papi.h in the sources
+CFLAGS += $(PAPI_INC)
+LIBS += $(PAPI_LIB)
+
+SRCS = xread.c xwrite.c gccg.c vol2mesh.c
+OBJS =  $(addsuffix .o, $(basename $(SRCS)))
+
+BINCONV_SRCS = xread.c binconv.c
+BINCONV_OBJS =  $(addsuffix .o, $(basename $(BINCONV_SRCS)))
+
+all: gccg binconv
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+gccg: $(OBJS) 
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+binconv: $(BINCONV_OBJS)
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+clean:
+	rm -rf *.o gccg binconv

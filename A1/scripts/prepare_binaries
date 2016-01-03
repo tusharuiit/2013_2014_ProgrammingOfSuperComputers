@@ -1,0 +1,11 @@
+#!/bin/sh
+
+for opt in "-g" "-O1" "-O2" "-O3" "-O3 -opt-prefetch"; do
+    for profile in "" "-DCACHE_PROFILE"; do
+        DIR="code_$(echo "${opt}" | tr " " "_")_${profile}"
+        echo ${DIR}
+        cp -R code ${DIR}
+        sed -e "s/@OPT@/${opt}/g" -e "s/@PROFILE@/${profile}/g" ${DIR}/Makefile.in >${DIR}/Makefile
+        make -C ${DIR} gccg
+    done
+done
